@@ -11,6 +11,10 @@ A lightweight, local-first Chrome/Edge search extension. The UI is bundled with 
 - Local result cache with configurable lifetime.
 - Approximate response-payload byte count for API responses.
 
+## Build an installable ZIP
+
+GitHub Actions runs **Build extension package** on pushes to `main` that change extension files, and can also be started manually from the Actions tab. The workflow validates the manifest and JavaScript, then uploads a `LightSearch-extension` ZIP artifact. Download the artifact from the completed workflow run and extract it before loading the folder as an unpacked extension.
+
 ## Install locally
 
 1. Download or clone this repository.

@@ -8,7 +8,6 @@ A lightweight, local-first Chrome/Edge search extension. The search page is bund
 - Google provider using the official Custom Search JSON API when configured.
 - Google fallback opens the normal Google results page when API credentials are absent.
 - DuckDuckGo provider opens its regular results page (not yet a compact data adapter).
-- Local result cache with configurable lifetime.
 - Approximate response-payload byte count for API responses.
 
 ## Build an installable ZIP
@@ -35,15 +34,13 @@ Google's API availability, quotas, pricing, and terms can change. The extension 
 ## Data and privacy
 
 - The extension UI and scripts are packaged locally; it does not load remote UI assets.
-- Search result payloads are cached in `chrome.storage.local`.
-- API settings are stored in `chrome.storage.sync`.
+- Search queries and result payloads are not stored by the extension. Requests use `cache: "no-store"` to request fresh results.\n- API settings are stored in `chrome.storage.sync`.
 - Searches are sent to the selected provider. Google API keys are sent to Google's API endpoint as required for authentication.
 - The displayed byte count measures the response body only; it is an approximation, not total network traffic (headers, TLS, and other browser traffic are excluded).
 
 ## Roadmap
 
 - Add additional structured-data providers behind a common adapter interface.
-- Improve cache controls and stale-result behavior.
 - Add a repeatable network-transfer comparison against normal search.
 - Add automated UI and provider tests.
 

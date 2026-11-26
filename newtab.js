@@ -8,10 +8,10 @@ function t(key){return I18N[lang][key]||key}
 function setLanguage(value){lang=value;document.documentElement.lang=value;document.documentElement.dir=value==="he"?"rtl":"ltr";document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.dataset.i18n));document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));$("languageButton").textContent=value==="he"?"English":"עברית"}
 $("languageButton").addEventListener("click",()=>setLanguage(lang==="he"?"en":"he"));
 async function getSettings(){return await chrome.storage.sync.get({googleApiKey:"",googleCx:"",cacheMinutes:30})}
-function cacheKey(provider,q,start){return "ls:"+provider+":"+start+":"+q.trim().toLowerCase()}
-async function googleSearch(q,start,settings){
+function cacheKey(provider,q,start,compact){return "ls:"+provider+":"+start+":"+(compact?"compact":"full")+":"+q.trim().toLowerCase()}
+async function googleSearch(q,start,settings,compact){
  if(!settings.googleApiKey||!settings.googleCx)throw new Error("SETUP_REQUIRED");
- const url=new URL("https://www.googleapis.com/customsearch/v1");url.search=new URLSearchParams({key:settings.googleApiKey,cx:settings.googleCx,q,num:"10",start:String(start)});
+ const url=new URL("https://www.googleapis.com/customsearch/v1");url.search=new URLSearchParams({key:settings.googleApiKey,cx:settings.googleCx,q,num:compact?"5":"10",start:String(start)});
  const response=await fetch(url);if(!response.ok)throw new Error("HTTP_"+response.status);
  const text=await response.text();let data;try{data=JSON.parse(text)}catch{throw new Error("BAD_JSON")}
  return {items:(data.items||[]).map(x=>({title:x.title,url:x.link,snippet:x.snippet||""})),bytes:new Blob([text]).size,total:data.searchInformation?.totalResults||"0"};
@@ -23,19 +23,19 @@ async function renderItems(items,append=false){
 }
 async function search(start=1){
  const q=$("query").value.trim();if(!q)return;currentQuery=q;
- const provider=$("provider").value,compact=$("compactMode").checked;
+ const provider=$("provider").value,compact=$("compactMode").checked,requestedCount=compact?5:10;
  $("resultsSection").hidden=false;$("status").textContent=t("loading");$("moreButton").hidden=true;
  if(provider==="duckduckgo"){const u="https://duckduckgo.com/?q="+encodeURIComponent(q);chrome.tabs.create({url:u});$("status").textContent=lang==="he"?"נפתח חיפוש DuckDuckGo בכרטיסייה חדשה.":"DuckDuckGo search opened in a new tab.";return}
- const settings=await getSettings(),key=cacheKey(provider,q,start),cached=await chrome.storage.local.get(key);
+ const settings=await getSettings(),key=cacheKey(provider,q,start,compact),cached=await chrome.storage.local.get(key);
  const ttl=(settings.cacheMinutes||30)*60*1000;
  if(cached[key]&&Date.now()-cached[key].savedAt<ttl){
-  await renderItems(cached[key].data.items,start>1);$("status").textContent=t("cached")+" · "+new Date(cached[key].savedAt).toLocaleString();$("resultMeta").textContent=t("approx")+": "+cached[key].data.bytes+" B";$("moreButton").hidden=cached[key].data.items.length<10;nextStart=start+10;return;
+  await renderItems(cached[key].data.items,start>1);$("status").textContent=t("cached")+" · "+new Date(cached[key].savedAt).toLocaleString();$("resultMeta").textContent=t("approx")+": "+cached[key].data.bytes+" B";$("moreButton").hidden=cached[key].data.items.length<requestedCount;nextStart=start+cached[key].data.items.length;return;
  }
  try{
-  const data=await googleSearch(q,start,settings);
+  const data=await googleSearch(q,start,settings,compact);
   await chrome.storage.local.set({[key]:{savedAt:Date.now(),data}});
   await renderItems(data.items,start>1);$("status").textContent=t("fresh");$("resultMeta").textContent=t("approx")+": "+data.bytes+" B";
-  $("moreButton").hidden=data.items.length<10;nextStart=start+10;
+  $("moreButton").hidden=data.items.length<requestedCount;nextStart=start+data.items.length;
  }catch(err){
   if(err.message==="SETUP_REQUIRED"){
    $("status").textContent=t("setup");const a=document.createElement("a");a.href="https://www.google.com/search?q="+encodeURIComponent(q);a.target="_blank";a.rel="noopener noreferrer";a.className="result-card";a.textContent=t("openGoogle");$("results").replaceChildren(a);

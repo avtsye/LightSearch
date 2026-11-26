@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "LightSearch",
+  "version": "0.1.0",
+  "description": "A lightweight, local-first search interface designed to reduce unnecessary data transfer.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.googleapis.com/*"
+  ],
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "options_page": "options.html",
+  "icons": {}
+}

@@ -1,6 +1,6 @@
 # LightSearch
 
-A lightweight, local-first Chrome/Edge search extension. The UI is bundled with the extension; search results are requested as structured data when an API is configured.
+A lightweight, local-first Chrome/Edge search extension. The search page is bundled with the extension; results are fetched live and rendered directly in that page. No search-result cache is used.
 
 ## Current status: 0.1.0
 

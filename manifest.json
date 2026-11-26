@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LightSearch",
   "version": "0.1.0",
-  "description": "A lightweight, local-first search interface designed to reduce unnecessary data transfer.",
+  "description": "A lightweight, local-first search interface with live results and no search-result cache.",
   "permissions": [
     "storage"
   ],

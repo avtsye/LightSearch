@@ -1,0 +1,55 @@
+name: Build extension package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'manifest.json'
+      - '*.html'
+      - '*.js'
+      - '*.css'
+      - '.github/workflows/build-extension.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Validate and package LightSearch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate manifest and extension files
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+          const required = ['newtab.html', 'newtab.js', 'options.html', 'options.js', 'styles.css'];
+          if (manifest.manifest_version !== 3) throw new Error('Manifest V3 is required');
+          if (!manifest.name || !manifest.version) throw new Error('Missing extension name/version');
+          if (!manifest.chrome_url_overrides?.newtab) throw new Error('New Tab override is missing');
+          for (const file of required) {
+            if (!fs.existsSync(file)) throw new Error('Missing required file: ' + file);
+          }
+          console.log('Manifest and required files are valid.');
+          NODE
+          node --check newtab.js
+          node --check options.js
+
+      - name: Create installable ZIP
+        run: |
+          mkdir -p dist
+          zip -r dist/LightSearch-${{ github.sha }}.zip \
+            manifest.json newtab.html newtab.js options.html options.js styles.css \
+            -x '*.map'
+
+      - name: Upload extension ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: LightSearch-extension
+          path: dist/LightSearch-${{ github.sha }}.zip
+          if-no-files-found: error
+          retention-days: 30

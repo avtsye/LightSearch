@@ -1,0 +1,3 @@
+const form=document.getElementById("settingsForm"),status=document.getElementById("saveStatus");
+chrome.storage.sync.get({googleApiKey:"",googleCx:"",cacheMinutes:30}).then(s=>{document.getElementById("googleApiKey").value=s.googleApiKey;document.getElementById("googleCx").value=s.googleCx;document.getElementById("cacheMinutes").value=s.cacheMinutes});
+form.addEventListener("submit",async e=>{e.preventDefault();const cacheMinutes=Math.max(0,Math.min(1440,Number(document.getElementById("cacheMinutes").value)||0));await chrome.storage.sync.set({googleApiKey:document.getElementById("googleApiKey").value.trim(),googleCx:document.getElementById("googleCx").value.trim(),cacheMinutes});status.textContent="ההגדרות נשמרו במכשיר."});

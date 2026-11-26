@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f8fb">
+  <title>LightSearch</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="newtab.html" aria-label="LightSearch home"><span class="brand-mark">L</span><span>LightSearch</span></a>
+    <div class="top-actions">
+      <button id="languageButton" class="quiet-button" type="button">English</button>
+      <a class="settings-link" href="options.html" data-i18n="settings">הגדרות</a>
+    </div>
+  </header>
+  <main class="search-shell">
+    <div class="hero">
+      <div class="hero-mark" aria-hidden="true">L</div>
+      <h1>LightSearch</h1>
+      <p data-i18n="tagline">חיפוש פשוט. פחות נתונים מיותרים.</p>
+    </div>
+    <form id="searchForm" class="search-form">
+      <label class="sr-only" for="query" data-i18n="searchLabel">מה לחפש?</label>
+      <input id="query" name="q" type="search" autocomplete="off" autofocus placeholder="מה תרצה לחפש?" data-i18n-placeholder="searchPlaceholder" required>
+      <button class="search-button" type="submit" data-i18n="search">חיפוש</button>
+    </form>
+    <div class="controls">
+      <label class="provider-label" for="provider" data-i18n="engine">מנוע חיפוש</label>
+      <select id="provider">
+        <option value="google">Google</option>
+        <option value="duckduckgo">DuckDuckGo</option>
+      </select>
+      <label class="toggle-label"><input id="compactMode" type="checkbox" checked><span data-i18n="compact">מצב חסכוני</span></label>
+    </div>
+    <section id="resultsSection" class="results-section" aria-live="polite" hidden>
+      <div class="results-heading">
+        <h2 data-i18n="results">תוצאות</h2>
+        <span id="resultMeta" class="result-meta"></span>
+      </div>
+      <div id="status" class="status" role="status"></div>
+      <div id="results" class="results-list"></div>
+      <button id="moreButton" class="more-button" type="button" hidden data-i18n="more">הצג עוד</button>
+    </section>
+    <p class="privacy-note" data-i18n="privacy">החיפושים נשמרים מקומית במכשיר. מפתחות API, אם הוגדרו, נשמרים בהגדרות התוסף.</p>
+  </main>
+  <footer><span>LightSearch</span><span data-i18n="footer">חיפוש חסכוני, בשליטתך.</span></footer>
+  <script src="newtab.js"></script>
+</body>
+</html>

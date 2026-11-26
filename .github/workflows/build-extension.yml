@@ -39,6 +39,21 @@ jobs:
           node --check newtab.js
           node --check options.js
 
+          node - <<'NODE'
+          const fs = require('node:fs');
+          for (const [htmlFile, jsFile, pattern] of [
+            ['newtab.html', 'newtab.js', /\$\(["']([^"']+)["']\)/g],
+            ['options.html', 'options.js', /getElementById\(["']([^"']+)["']\)/g],
+          ]) {
+            const html = fs.readFileSync(htmlFile, 'utf8');
+            const js = fs.readFileSync(jsFile, 'utf8');
+            const ids = new Set([...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]));
+            const missing = [...js.matchAll(pattern)].map(match => match[1]).filter(id => !ids.has(id));
+            if (missing.length) throw new Error(jsFile + ' references missing HTML ids: ' + [...new Set(missing)].join(', '));
+          }
+          console.log('HTML/JavaScript element references are valid.');
+          NODE
+
       - name: Create installable ZIP
         run: |
           mkdir -p dist

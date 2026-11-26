@@ -51,7 +51,7 @@ async function search(start=1){
   await renderItems(data.items,start>1);$("status").textContent=t("fresh");$("resultMeta").textContent=t("approx")+": "+data.bytes+" B";$("moreButton").hidden=data.items.length<requestedCount;nextStart=start+data.items.length;
  }catch(err){
   if(err.message==="SETUP_REQUIRED"){$("status").textContent=t("setup");const a=document.createElement("a");a.href="https://www.google.com/search?q="+encodeURIComponent(q);a.target="_blank";a.rel="noopener noreferrer";a.className="result-card";a.textContent=t("openGoogle");$("results").replaceChildren(a)}
-  else{$("status").textContent=t("error")+" ("+err.message+")"}
+  else if(ttl>0&&cached[key]){await renderItems(cached[key].data.items,start>1);$("status").textContent=t("stale");$("resultMeta").textContent=t("approx")+": "+cached[key].data.bytes+" B · cache";$("moreButton").hidden=cached[key].data.items.length<requestedCount;nextStart=start+cached[key].data.items.length}\n  else{$("status").textContent=t("error")+" ("+err.message+")"}
  }
 }
 $("searchForm").addEventListener("submit",e=>{e.preventDefault();search(1)});
